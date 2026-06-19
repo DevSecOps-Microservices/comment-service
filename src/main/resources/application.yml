@@ -1,0 +1,12 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: comment-service
+
+  config:
+    import: configserver:${SPRING_CONFIG_SERVER_URL:http://localhost:8888}
+  cloud:
+    config:
+      enabled: true
