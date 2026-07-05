@@ -56,14 +56,11 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: snyk whoami
 
-      - name: Make Maven Wrapper executable
-        run: chmod +x mvnw
-
       - name: Dependency scan (Snyk)
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          ./mvnw dependency:tree
+          mvn dependency:tree
           snyk test \
             --file=pom.xml \
             --package-manager=maven \
