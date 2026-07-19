@@ -117,22 +117,3 @@ jobs:
         run: |
           docker tag comment-service:latest ghcr.io/devsecops-microservices/comment-service:latest
           docker push ghcr.io/devsecops-microservices/comment-service:latest
-
-      - name: Deploy comment-service
-        run: |
-          docker stop comment-service || true
-          docker rm comment-service || true
-          docker pull ghcr.io/devsecops-microservices/comment-service:latest
-          docker run -d \
-            --name comment-service \
-            -p 8083:8083 \
-            --restart unless-stopped \
-            -e SPRING_PROFILES_ACTIVE=docker \
-            ghcr.io/devsecops-microservices/comment-service:latest
-          sleep 15
-          echo "comment-service deployed successfully"
-
-      - name: Verify deployment
-        run: |
-          docker ps | grep comment-service
-          echo "Container is running ✅"
