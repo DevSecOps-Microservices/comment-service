@@ -73,10 +73,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn clean package -DskipTests sonar:sonar
-          -Dsonar.projectKey=DevSecOps-Microservices_comment-service
-          -Dsonar.organization=devsecops-microservices
-          -Dsonar.host.url=https://sonarcloud.io
+        run: |
+          ./mvnw clean verify \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -DskipTests \
+            -Dsonar.projectKey=DevSecOps-Microservices_comment-service \
+            -Dsonar.organization=devsecops-microservices \
+            -Dsonar.host.url=https://sonarcloud.io
 
       - name: Run unit tests
         run: mvn test
@@ -115,5 +118,10 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker tag comment-service:latest ghcr.io/devsecops-microservices/comment-service:latest
+          IMAGE_TAG=v1.${{ github.run_number }}-${GITHUB_SHA::7}
+
+          docker tag service-incident:latest ghcr.io/devsecops-microservices/comment-service:latest
+          docker tag service-incident:latest ghcr.io/devsecops-microservices/comment-service:${IMAGE_TAG}
+
           docker push ghcr.io/devsecops-microservices/comment-service:latest
+          docker push ghcr.io/devsecops-microservices/comment-service:${IMAGE_TAG}
