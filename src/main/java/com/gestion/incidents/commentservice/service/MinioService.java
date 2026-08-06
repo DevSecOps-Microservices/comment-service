@@ -21,7 +21,11 @@ public class MinioService {
     @Value("${minio.bucket.commentaires:commentaires-pieces-jointes}")
     private String bucket;
 
+    @Value("${minio.public-url:http://localhost:9000}")
+    private String publicUrl;
+
     public MinioService(MinioClient minioClient) {
+
         this.minioClient = minioClient;
     }
 
@@ -37,8 +41,19 @@ public class MinioService {
     }
 
     public String genererUrlPresignee(String key) throws Exception {
-        return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
-            .bucket(bucket).object(key).method(Method.GET).expiry(1, TimeUnit.HOURS).build());
+        String presignedUrl = minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .bucket(bucket)
+                        .object(key)
+                        .method(Method.GET)
+                        .expiry(1, TimeUnit.HOURS)
+                        .build());
+
+        // Replace internal Docker URL with public URL
+        return presignedUrl.replaceFirst(
+                "http://minio:9000",
+                publicUrl
+        );
     }
 
     public void supprimerFichier(String key) throws Exception {
